@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Pie } from "react-chartjs-2";
-import { Line } from "react-chartjs-2";
+import React, { useEffect, useState } from "react"; 
+import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -8,15 +7,13 @@ import {
   Legend,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
 } from "chart.js";
 import AddProductModal from "./AddProductModal";
 import AddCategoryModal from "./AddCategoryModal"; 
 import AddToppingModal from "./AddToppingModal"; 
 
-
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -33,13 +30,18 @@ export default function AdminDashboard() {
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [showAddToppingModal, setShowAddToppingModal] = useState(false);
-  const [ordersData, setOrdersData] = useState([]);
 
   useEffect(() => {
     // Fetch dashboard stats
     fetch("http://127.0.0.1:5000/api/dashboard/stats")
       .then((res) => res.json())
-      .then((data) => setStats(data))
+      .then((data) => setStats(prev => ({
+        ...prev,
+        orders: data.orders,
+        users: data.users,
+        products: data.products,
+        totalRevenue: data.totalRevenue
+      })))
       .catch((err) => console.error("Error fetching stats:", err));
 
     // Fetch low stock products
@@ -54,64 +56,67 @@ export default function AdminDashboard() {
       .then((data) => setCategories(data))
       .catch((err) => console.error("Error fetching categories:", err));
 
-    // Fetch recent orders
-    fetch("http://127.0.0.1:5000/orders")
-      .then((res) => res.json())
-      .then((orders) => {
-        setOrdersData(orders);
-        const recentOrders = orders.map((o) => ({
-          orderId: o.id,
-          customerName: o.customerName || "Unknown",
-          totalPrice: o.totalPrice || 0,
-          status: o.status || "Pending",
-        }));
-        setStats((prev) => ({ ...prev, recentOrders }));
-      })
-      .catch((err) => console.error("Error fetching recent orders:", err));
-
     // Fetch toppings
     fetch("http://127.0.0.1:5000/toppings/")
       .then((res) => res.json())
       .then((data) => setToppings(data))
       .catch((err) => console.error("Error fetching toppings:", err));
+
+    // Fetch orders and process recentOrders + topProducts
+    // Fetch orders and process recentOrders + topProducts
+fetch("http://localhost:4000/orders")
+  .then(res => res.json())
+  .then(orders => {
+    // Map recent orders properly
+    const recentOrders = orders.map(o => ({
+      orderId: o.id,
+      customerName: o.customer?.name || "Unknown",
+      totalPrice: o.totalPrice || 0,
+      status: o.status || "Pending",
+      productList: o.products?.map(p => `${p.name} x${p.quantity}`).join(", ") || "",
+      date: o.date ? new Date(o.date).toLocaleDateString() : ""
+    }));
+
+    // Aggregate top products
+    const productMap = {};
+    orders.forEach(order => {
+      order.products?.forEach(p => {
+        if (!productMap[p.name]) productMap[p.name] = 0;
+        productMap[p.name] += p.quantity || 0;
+      });
+    });
+
+    const topProducts = Object.keys(productMap)
+      .map(name => ({ name, totalQuantity: productMap[name] }))
+      .sort((a, b) => b.totalQuantity - a.totalQuantity)
+      .slice(0, 5);
+
+    setStats(prev => ({ ...prev, recentOrders, topProducts }));
+  })
+  .catch(err => console.error("Error fetching orders:", err));
+
   }, []);
 
   // Pie chart data for toppings
   const pieData = {
-    labels: toppings.map((t) => t.name),
-    datasets: [
-      {
-        label: "Topping Stock",
-        data: toppings.map((t) => t.stock),
-        backgroundColor: [
-          "#D9A066", // Pearl
-          "#F6E0B5", // Nata de Coco
-          "#CFA07D", // Pudding
-          "#B08B69", // Cheese Foam
-          "#E1C699", 
-          "#D1B399",
-          "#F3E3D1",
-        ],
-        borderColor: "#fff",
-        borderWidth: 2,
-      },
-    ],
+    labels: toppings.map(t => t.name),
+    datasets: [{
+      label: "Topping Stock",
+      data: toppings.map(t => t.stock),
+      backgroundColor: ["#D9A066","#F6E0B5","#CFA07D","#B08B69","#E1C699","#D1B399","#F3E3D1"],
+      borderColor: "#fff",
+      borderWidth: 2,
+    }]
   };
 
-   // Line chart for top products quantity per week
-  const lineData = {
+  // Bar chart data for top products
+  const topProductChartData = {
     labels: stats.topProducts.map(p => p.name),
     datasets: [{
-      label: "Quantity Sold (per week)",
-      data: stats.topProducts.map(p => p.weeklyQuantity || 0),
-      fill: false,
-      borderColor: "#CFA07D",
-      backgroundColor: "#B08B69",
-      tension: 0.4, // zigzag/curvy line
-      pointRadius: 6,
-      pointHoverRadius: 8,
-      pointBackgroundColor: "#D9A066",
-    }],
+      label: "Units Sold",
+      data: stats.topProducts.map(p => p.totalQuantity),
+      backgroundColor: ["#CFA07D","#B08B69","#D9A066","#F6E0B5","#F3E3D1"],
+    }]
   };
 
   return (
@@ -155,8 +160,8 @@ export default function AdminDashboard() {
         {/* Charts */}
         <div className="charts-container">
           <div className="chart-card">
-            <h3>Top Selling Products (Weekly)</h3>
-            {stats.topProducts.length > 0 ? <Line data={lineData} /> : <p>No product data</p>}
+            <h3>Top Selling Products</h3>
+            {stats.topProducts.length > 0 ? <Bar data={topProductChartData} /> : <p>No product data</p>}
           </div>
 
           <div className="chart-card">
@@ -244,13 +249,11 @@ export default function AdminDashboard() {
             onClose={() => setShowAddProductModal(false)}
           />
         )}
-
         {showAddCategoryModal && (
           <AddCategoryModal
             onClose={() => setShowAddCategoryModal(false)}
           />
         )}
-
         {showAddToppingModal && (
           <AddToppingModal
             onClose={() => setShowAddToppingModal(false)}
