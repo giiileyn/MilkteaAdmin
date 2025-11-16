@@ -1,38 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react"; 
+import AddProductModal from "./AddProductModal";
 
 const Product = () => {
-  const products = [
-    {
-      id: 1,
-      name: "Organic Tomatoes",
-      category: "Vegetables",
-      stock: 45,
-      price: "₱ 120.00",
-      profit: "₱ 40.00",
-      status: "In Stock",
-      image: "/tomato.png",
-    },
-    {
-      id: 2,
-      name: "Organic Tomatoes",
-      category: "Vegetables",
-      stock: 45,
-      price: "₱ 120.00",
-      profit: "₱ 40.00",
-      status: "Low Stock",
-      image: "/tomato.png",
-    },
-    {
-      id: 3,
-      name: "Organic Tomatoes",
-      category: "Vegetables",
-      stock: 45,
-      price: "₱ 120.00",
-      profit: "₱ 40.00",
-      status: "Out of Stock",
-      image: "/tomato.png",
-    },
-  ];
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
+  // Fetch products
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/products/");
+      const data = await res.json();
+
+      const formatted = data.map((p) => ({
+        id: p._id,
+        name: p.name,
+        category: p.category,
+        stock: p.stock,
+        price: `₱ ${p.price.toFixed(2)}`,
+        profit: `₱ 40.00`,
+        status:
+          p.status === "available"
+            ? "In Stock"
+            : p.status === "out-of-stock"
+            ? "Out of Stock"
+            : "Low Stock",
+        image: p.image || "/placeholder.png",
+      }));
+
+      setProducts(formatted);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
+  };
+
+  // Fetch categories (for modal)
+ const fetchCategories = async () => {
+  try {
+    const res = await fetch("http://127.0.0.1:5000/api/categories");
+    const data = await res.json();
+    console.log("Fetched categories:", data);
+
+    setCategories(
+      Array.isArray(data)
+        ? data.map((c) => ({ id: c.id, name: c.name }))
+        : []
+    );
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+  }
+};
+
+
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -56,16 +80,28 @@ const Product = () => {
       </div>
 
       <div className="filter-row">
-        <button className="filter-btn active">All (4)</button>
-        <button className="filter-btn">Low Stock (1)</button>
-        <button className="filter-btn">Out of Stock (1)</button>
-        <button className="add-btn">+ Add Product</button>
+        <button className="filter-btn active">All ({products.length})</button>
+
+        <button className="filter-btn">
+          Low Stock ({products.filter((p) => p.status === "Low Stock").length})
+        </button>
+
+        <button className="filter-btn">
+          Out of Stock (
+          {products.filter((p) => p.status === "Out of Stock").length})
+        </button>
+
+        {/* ADD PRODUCT MODAL BUTTON */}
+        <button className="add-btn" onClick={() => setShowModal(true)}>
+          + Add Product
+        </button>
       </div>
 
       <div className="product-list">
         {products.map((p) => (
           <div key={p.id} className="product-card">
-            <img src={p.image} className="product-img" alt="product" />
+            <img src={p.image} className="product-img" alt={p.name} />
+
             <div className="product-info">
               <h3>{p.name}</h3>
               <span className="category">{p.category}</span>
@@ -86,17 +122,28 @@ const Product = () => {
         ))}
       </div>
 
+      {/* SHOW MODAL (WITH CATEGORIES PASSED) */}
+      {showModal && (
+        <AddProductModal
+          categories={categories}
+          onClose={() => {
+            setShowModal(false);
+            fetchProducts(); // refresh after adding
+          }}
+        />
+      )}
+
+      {/* STYLES (UNCHANGED) */}
       <style>{`
-        /* Force full width */
         .product-container {
           padding: 30px;
           background: #F8F4EC;
           color: #4B3A2F;
           font-family: 'Inter', sans-serif;
-          width: 100vw; /* full viewport width */
-          max-width: 100%; /* prevent scroll */
+          width: 100vw;
+          max-width: 100%;
           box-sizing: border-box;
-          overflow-x: hidden; /* prevent horizontal scroll */
+          overflow-x: hidden;
         }
 
         h2 {
@@ -172,7 +219,6 @@ const Product = () => {
           display: flex;
           align-items: center;
           width: 100%;
-          box-sizing: border-box;
         }
 
         .product-img {

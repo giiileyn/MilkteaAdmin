@@ -1,51 +1,46 @@
-# crud/product.py
 from app.database import db
 from bson import ObjectId
-from typing import Optional, Dict
-import datetime
 
-async def create_product(product_data: Dict):
-    """
-    Inserts a new product into the 'products' collection.
-    Example product_data:
-    {
-        "name": "Classic Milk Tea",
-        "category": "Milk Tea",
-        "flavor": "Original",
-        "sizes": [{"name": "Regular", "price": 120}],
-        "toppings": ["Pearls"],
-        "image": "uploads/classic.jpg",
-        "stock": 50,
-        "status": "available",
-        "createdAt": datetime.datetime.utcnow()
-    }
-    """
-    product_data["createdAt"] = datetime.datetime.utcnow()
-    result = await db.products.insert_one(product_data)
-    product_data["_id"] = str(result.inserted_id)
-    return product_data
+# ================================
+#        CRUD PRODUCTS
+# ================================
 
-
-async def get_all_products():
+async def get_products():
     cursor = db.products.find()
-    products = [doc async for doc in cursor]
-    for p in products:
-        p["_id"] = str(p["_id"])
+    products = []
+    async for p in cursor:
+        p["_id"] = str(p["_id"])  # convert ObjectId to string
+        # convert nested ObjectIds if any
+        if "toppings" in p:
+            p["toppings"] = [str(t) for t in p["toppings"]]
+        products.append(p)
     return products
-
 
 async def get_product(product_id: str):
     product = await db.products.find_one({"_id": ObjectId(product_id)})
     if product:
         product["_id"] = str(product["_id"])
+        if "toppings" in product:
+            product["toppings"] = [str(t) for t in product["toppings"]]
     return product
 
+async def create_product(data: dict):
+    result = await db.products.insert_one(data)
+    new_product = await db.products.find_one({"_id": result.inserted_id})
+    new_product["_id"] = str(new_product["_id"])
+    if "toppings" in new_product:
+        new_product["toppings"] = [str(t) for t in new_product["toppings"]]
+    return new_product
 
-async def update_product(product_id: str, update_data: Dict):
-    await db.products.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
-    return await get_product(product_id)
-
+async def update_product(product_id: str, data: dict):
+    await db.products.update_one({"_id": ObjectId(product_id)}, {"$set": data})
+    updated_product = await db.products.find_one({"_id": ObjectId(product_id)})
+    if updated_product:
+        updated_product["_id"] = str(updated_product["_id"])
+        if "toppings" in updated_product:
+            updated_product["toppings"] = [str(t) for t in updated_product["toppings"]]
+    return updated_product
 
 async def delete_product(product_id: str):
     result = await db.products.delete_one({"_id": ObjectId(product_id)})
-    return {"deleted": result.deleted_count}
+    return result.deleted_count > 0

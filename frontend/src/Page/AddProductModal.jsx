@@ -116,19 +116,20 @@ export default function AddProductModal({ categories, onClose }) {
             required
           />
 
-          <select
-            name="category"
-            value={newProduct.category}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+         <select
+  name="category"
+  value={newProduct.category}
+  onChange={handleChange}
+  required
+>
+  <option value="">Select Category</option>
+  {categories.map((cat, index) => (
+    <option key={cat.id || index} value={cat.name}>
+      {cat.name}
+    </option>
+  ))}
+</select>
+
 
           <input
             type="text"

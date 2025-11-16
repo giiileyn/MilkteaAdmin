@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from bson.errors import InvalidId
 from app.crud import user as user_crud
-from app.database import db  # make sure this import exists
+from app.database import db
 
 router = APIRouter()
 

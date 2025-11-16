@@ -78,8 +78,8 @@ const Sidebar = () => {
           <DropdownItem
             icon={<BiCategoryAlt size={20} />}
             label="Categories"
-            to="/categories"
-            active={active === "/categories"}
+            to="/category"
+            active={active === "/category"}
           />
         </div>
       )}

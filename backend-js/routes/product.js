@@ -1,7 +1,19 @@
 import express from "express";
-import { Product } from "../models/Product.js"; // adjust path if needed
+import {
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+} from "../controllers/productController.js"; 
+import { Product } from "../models/Product.js"; 
 
 const router = express.Router();
+
+// GET all products
+router.get("/", getProducts);
+
+// GET single product
+router.get("/:id", getProductById);
 
 // CREATE PRODUCT
 router.post("/", async (req, res) => {
@@ -14,4 +26,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-export default router; // <-- export the router, not Product
+// UPDATE PRODUCT
+router.put("/:id", updateProduct);
+
+// DELETE PRODUCT
+router.delete("/:id", deleteProduct);
+
+export default router;

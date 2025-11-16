@@ -36,8 +36,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 # Import routers AFTER creating the app
-from app.routes.products import router as products_router
+from app.routes.product import router as products_router
 from app.routes.category import router as category_router
 from app.routes.order import router as orders_router
 from app.routes import topping
@@ -62,6 +64,7 @@ app.include_router(user_router.router, prefix="/users", tags=["Users"])
 @app.get("/")
 def root():
     return {"message": "MilkTea Backend Running"}
+
 
 
 # ================================
