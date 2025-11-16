@@ -1,0 +1,16 @@
+[
+  {
+    "productId": "replace_with_product_id_after_seed",
+    "size": "Large",
+    "toppings": ["Pearl"],
+    "quantity": 20,
+    "totalPrice": 1500
+  },
+  {
+    "productId": "replace_with_product_id_after_seed",
+    "size": "Regular",
+    "toppings": ["Nata de Coco"],
+    "quantity": 15,
+    "totalPrice": 1275
+  }
+]

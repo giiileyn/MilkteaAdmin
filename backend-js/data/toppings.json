@@ -1,0 +1,6 @@
+[
+  { "name": "Pearl", "price": 10, "stock": 500, "status": "available" },
+  { "name": "Nata de Coco", "price": 12, "stock": 400, "status": "available" },
+  { "name": "Pudding", "price": 15, "stock": 350, "status": "available" },
+  { "name": "Cheese Foam", "price": 20, "stock": 300, "status": "available" }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "user": "69188da0440f8ea7fa652f78",
+    "products": [
+      {
+        "productId": "64fa1b2c3d4e5f6789012345",
+        "name": "Classic Milk Tea",
+        "size": "Large",
+        "toppings": ["Pearl"],
+        "quantity": 2,
+        "price": 150
+      }
+    ],
+    "totalPrice": 300,
+    "status": "completed",
+    "createdAt": "2025-11-12T10:00:00.000Z",
+    "updatedAt": "2025-11-12T10:00:00.000Z"
+  },
+  {
+    "user": "69188dc1440f8ea7fa652f7d",
+    "products": [
+      {
+        "productId": "64fa1b2c3d4e5f6789012346",
+        "name": "Mango Fruit Tea",
+        "size": "Regular",
+        "toppings": ["Nata de Coco"],
+        "quantity": 1,
+        "price": 85
+      }
+    ],
+    "totalPrice": 85,
+    "status": "pending",
+    "createdAt": "2025-11-12T11:00:00.000Z",
+    "updatedAt": "2025-11-12T11:00:00.000Z"
+  },
+  {
+    "user": "69188dc1440f8ea7fa652f7d",
+    "products": [
+      {
+        "productId": "64fa1b2c3d4e5f6789012347",
+        "name": "Brown Sugar Milk Tea",
+        "size": "Regular",
+        "toppings": ["Pearl", "Pudding"],
+        "quantity": 1,
+        "price": 120
+      },
+      {
+        "productId": "64fa1b2c3d4e5f6789012348",
+        "name": "Taro Milk Tea",
+        "size": "Large",
+        "toppings": [],
+        "quantity": 1,
+        "price": 130
+      }
+    ],
+    "totalPrice": 250,
+    "status": "completed",
+    "createdAt": "2025-11-13T09:30:00.000Z",
+    "updatedAt": "2025-11-13T09:30:00.000Z"
+  },
+  {
+    "user": "69188da0440f8ea7fa652f78",
+    "products": [
+      {
+        "productId": "64fa1b2c3d4e5f6789012349",
+        "name": "Matcha Latte",
+        "size": "Large",
+        "toppings": ["Red Bean"],
+        "quantity": 3,
+        "price": 180
+      }
+    ],
+    "totalPrice": 540,
+    "status": "pending",
+    "createdAt": "2025-11-14T14:00:00.000Z",
+    "updatedAt": "2025-11-14T14:00:00.000Z"
+  }
+]

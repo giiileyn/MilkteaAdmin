@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Classic Milk Tea",
+    "category": "Classic Milk Tea",
+    "flavor": "Black Tea",
+    "price": 60,
+    "sizes": [
+      { "name": "Regular", "price": 60 },
+      { "name": "Large", "price": 75 }
+    ],
+    "toppings": ["Pearl", "Nata de Coco"],
+    "image": "https://res.cloudinary.com/demo/image/upload/v1731473107/classic_milktea.png",
+    "stock": 500,
+    "status": "available"
+  },
+  {
+    "name": "Wintermelon Milk Tea",
+    "category": "Classic Milk Tea",
+    "flavor": "Wintermelon",
+    "price": 65,
+    "sizes": [
+      { "name": "Regular", "price": 65 },
+      { "name": "Large", "price": 80 }
+    ],
+    "toppings": ["Pearl"],
+    "image": "https://res.cloudinary.com/demo/image/upload/v1731473107/wintermelon_milktea.png",
+    "stock": 600,
+    "status": "available"
+  },
+  {
+    "name": "Mango Fruit Tea",
+    "category": "Fruit Tea",
+    "flavor": "Mango",
+    "price": 70,
+    "sizes": [
+      { "name": "Regular", "price": 70 },
+      { "name": "Large", "price": 85 }
+    ],
+    "toppings": ["Nata de Coco"],
+    "image": "https://res.cloudinary.com/demo/image/upload/v1731473107/mango_fruittea.png",
+    "stock": 450,
+    "status": "available"
+  }
+]

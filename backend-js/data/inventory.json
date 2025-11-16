@@ -1,0 +1,7 @@
+[
+  { "name": "Black Tea Leaves", "type": "base", "quantity": 2000, "unit": "g", "threshold": 300 },
+  { "name": "Brown Sugar Syrup", "type": "syrup", "quantity": 5000, "unit": "ml", "threshold": 500 },
+  { "name": "Milk Powder", "type": "powder", "quantity": 10000, "unit": "g", "threshold": 1000 },
+  { "name": "Fresh Milk", "type": "milk", "quantity": 3000, "unit": "ml", "threshold": 500 },
+  { "name": "Tapioca Pearls", "type": "topping", "quantity": 1500, "unit": "g", "threshold": 200 }
+]
