@@ -6,6 +6,7 @@ import AdminDashboard from "./Page/AdminDashboard";
 import Layout from "./Components/Layout"; // import the Layout wrapper
 import Product from "./Page/Product";
 import Order from "./Page/Order";
+import Receipt from "./Page/Receipt";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/admin" element={ <Layout> <AdminDashboard /></Layout> }/>
         <Route path="/product" element={ <Layout> <Product /></Layout> }/>
         <Route path="/order" element={ <Layout> <Order /></Layout> }/>
+        <Route path="/receipt" element={ <Layout> <Receipt /></Layout> }/>
 
       </Routes>
     </Router>

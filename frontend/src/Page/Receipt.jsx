@@ -1,122 +1,51 @@
 import React from "react";
 
-export default function Receipt({ shop, address, tel, items, total, cash, change, payment }) {
+export default function Receipt({ order }) {
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2 style={styles.shopName}>{shop}</h2>
-        <div style={styles.info}>{address}</div>
-        <div style={styles.info}>Telp. {tel}</div>
+    <div style={{
+      fontFamily: "'Courier New', Courier, monospace",
+      padding: "20px",
+      color: "#333",
+      lineHeight: 1.4,
+    }}>
+      {/* Logo and Store Name */}
+      <div style={{ textAlign: "center", marginBottom: "15px" }}>
+        <h1 style={{ margin: 0, fontSize: "28px", color: "#B39172" }}>WowMilkteh</h1>
+        <p style={{ margin: 0, fontSize: "14px", color: "#8C7B6A" }}>Thank you for your order!</p>
       </div>
 
-      <div style={styles.separator}>******************************</div>
-
-      <div style={{ textAlign: "center", marginBottom: 10 }}>CASH RECEIPT</div>
-
-      <div style={styles.separator}>******************************</div>
-
-      <div style={styles.itemsHeader}>
-        <span style={{ textAlign: "left" }}>Description</span>
-        <span style={{ textAlign: "right" }}>Price</span>
+      {/* Order Info */}
+      <div style={{ marginBottom: "15px" }}>
+        <strong>Receipt:</strong> ORD-{String(order.id).padStart(3, "0")} <br />
+        <strong>Date:</strong> {order.date} <br />
+        <strong>Status:</strong> {order.status}
       </div>
 
-      {items.map((item, i) => (
-        <div key={i} style={styles.itemRow}>
-          <span>{item.name}</span>
-          <span>{item.price.toFixed(1)}</span>
-        </div>
-      ))}
+      <hr style={{ border: "1px dashed #C9B8A6", margin: "10px 0" }} />
 
-      <div style={styles.separator}>******************************</div>
-
-      <div style={styles.totalRow}>
-        <span>Total</span>
-        <span>{total.toFixed(1)}</span>
-      </div>
-      <div style={styles.totalRow}>
-        <span>Cash</span>
-        <span>{cash.toFixed(1)}</span>
-      </div>
-      <div style={styles.totalRow}>
-        <span>Change</span>
-        <span>{change.toFixed(1)}</span>
+      {/* Items */}
+      <div>
+        {order.items.map((item, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: "space-between", margin: "6px 0" }}>
+            <span>{item.qty}x {item.name}</span>
+            <span>₱ {item.price.toLocaleString()}</span>
+          </div>
+        ))}
       </div>
 
-      <div style={styles.separator}>******************************</div>
+      <hr style={{ border: "1px dashed #C9B8A6", margin: "10px 0" }} />
 
-      {payment && payment.type === "bank" && (
-        <>
-          <div>Bank card --- {payment.last4}</div>
-          <div>Approval Code #{payment.code}</div>
-          <div style={styles.separator}>******************************</div>
-        </>
-      )}
+      {/* Total */}
+      <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", fontSize: "16px", marginBottom: "20px" }}>
+        <span>Total:</span>
+        <span>₱ {order.total.toLocaleString()}</span>
+      </div>
 
-      <div style={{ textAlign: "center", fontWeight: "bold" }}>THANK YOU!</div>
-
-      {/* Barcode placeholder */}
-      <div style={styles.barcode}>
-        <div style={styles.bar}></div>
-        <div style={styles.bar}></div>
-        <div style={styles.bar}></div>
-        <div style={styles.bar}></div>
-        <div style={styles.bar}></div>
+      {/* Footer */}
+      <div style={{ textAlign: "center", fontSize: "12px", color: "#8C7B6A" }}>
+        <p>Visit us again at WowMilkteh!</p>
+        <p>Enjoy your drink!</p>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    width: 300,
-    padding: "20px 15px",
-    fontFamily: "'Courier New', Courier, monospace",
-    fontSize: 14,
-    background: "#fff",
-    border: "1px dashed #ccc",
-    margin: "20px auto",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  shopName: {
-    margin: 0,
-    fontSize: 16,
-  },
-  info: {
-    fontSize: 12,
-  },
-  separator: {
-    textAlign: "center",
-    fontSize: 14,
-    margin: "5px 0",
-  },
-  itemsHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    fontWeight: "bold",
-    marginTop: 5,
-  },
-  itemRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: 2,
-  },
-  totalRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    fontWeight: "bold",
-    marginTop: 2,
-  },
-  barcode: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: 15,
-  },
-  bar: {
-    width: 20,
-    height: 30,
-    background: "#000",
-  },
-};

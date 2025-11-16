@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import axios from "axios";
+import Receipt from "./Receipt"; // import your Receipt component
 
 export default function Order() {
   const [tab, setTab] = useState("All");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null); // for receipt
 
   // Fetch orders from backend
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await axios.get("http://localhost:4000/orders");
-        // transform backend response to frontend-friendly format
         const data = res.data.map((o, index) => ({
           id: index + 1,
           date: new Date(o.createdAt).toLocaleDateString("en-US", {
@@ -38,7 +39,6 @@ export default function Order() {
     fetchOrders();
   }, []);
 
-  // Filter orders based on tab
   const filteredOrders =
     tab === "All" ? orders : orders.filter((o) => o.status.toLowerCase() === tab.toLowerCase());
 
@@ -50,7 +50,7 @@ export default function Order() {
     <>
       <style>{`
         body { margin: 0; background: #F3E9DA !important; }
-        .order-page-container { padding: 20px; background: #F3E9DA; min-height: 100vh; width: 100vw; overflow-x: hidden; }
+        .order-page-container { padding: 20px; background: #F3E9DA; min-height: 100vh; width: 100vw; overflow-x: hidden; position: relative; }
         .order-tabs { display: flex; gap: 12px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; width: 100%; }
         .order-tab { padding: 10px 24px; border-radius: 25px; border: 1px solid #C9B8A6; background: #E6D6C4; cursor: pointer; font-size: 15px; font-weight: 500; color: #5A4632; white-space: nowrap; transition: 0.2s; }
         .order-tab.active { background: #B39172; color: white; border-color: #A07C5A; }
@@ -70,8 +70,11 @@ export default function Order() {
         .order-footer { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
         .order-footer small { font-size: 13px; color: #8C7B6A; }
         .order-footer h3 { margin: 3px 0; color: #5A4632; }
-        .btn.details { background: #CFC4B6; color: #5A4632; padding: 8px 16px; border-radius: 14px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 15px; }
-        .btn.details:hover { background: #B5A797; }
+        .btn.details, .btn.receipt { background: #CFC4B6; color: #5A4632; padding: 8px 16px; border-radius: 14px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 10px; }
+        .btn.details:hover, .btn.receipt:hover { background: #B5A797; }
+        .receipt-panel { position: fixed; top: 0; right: 0; width: 400px; max-width: 90%; height: 100vh; background: white; box-shadow: -3px 0 15px #00000020; padding: 20px; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 999; }
+        .receipt-panel.open { transform: translateX(0); }
+        .receipt-close { position: absolute; top: 15px; right: 15px; cursor: pointer; font-weight: bold; font-size: 18px; }
       `}</style>
 
       <div className="order-page-container">
@@ -79,12 +82,18 @@ export default function Order() {
         <div className="order-tabs">
           {["All", "Pending", "Processing", "Completed"].map((t) => (
             <button
-              key={t}
-              className={`order-tab ${tab === t ? "active" : ""}`}
-              onClick={() => setTab(t)}
+              className="btn receipt"
+              onClick={() => {
+                if (order.status.toLowerCase() === "completed") {
+                  setSelectedOrder(order); // show receipt
+                } else {
+                  alert("This order is still processing."); // show message
+                }
+              }}
             >
-              {t}
+              Receipt
             </button>
+
           ))}
         </div>
 
@@ -119,14 +128,39 @@ export default function Order() {
               </div>
 
               <div className="order-footer">
-                <div>
-                  <small>Total Amount</small>
-                  <h3>₱ {order.total.toLocaleString()}</h3>
-                </div>
+              <div>
+                <small>Total Amount</small>
+                <h3>₱ {order.total.toLocaleString()}</h3>
+              </div>
+              <div>
                 <button className="btn details">Details</button>
+                <button
+                  className="btn receipt"
+                  onClick={() => {
+                    if (order.status.toLowerCase() === "completed") {
+                      setSelectedOrder(order);
+                    } else {
+                      alert("This order is still processing.");
+                    }
+                  }}
+                >
+                  Receipt
+                </button>
               </div>
             </div>
+
+            </div>
           ))
+        )}
+      </div>
+
+      {/* RECEIPT SIDE PANEL */}
+      <div className={`receipt-panel ${selectedOrder ? "open" : ""}`}>
+        {selectedOrder && (
+          <>
+            <div className="receipt-close" onClick={() => setSelectedOrder(null)}>×</div>
+            <Receipt order={selectedOrder} />
+          </>
         )}
       </div>
     </>

@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { Pie } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+} from "chart.js";
 import AddProductModal from "./AddProductModal";
 import AddCategoryModal from "./AddCategoryModal"; 
 import AddToppingModal from "./AddToppingModal"; 
 
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -15,41 +29,90 @@ export default function AdminDashboard() {
   });
   const [lowStock, setLowStock] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [toppings, setToppings] = useState([]);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [showAddToppingModal, setShowAddToppingModal] = useState(false);
-  
+  const [ordersData, setOrdersData] = useState([]);
+
   useEffect(() => {
+    // Fetch dashboard stats
     fetch("http://127.0.0.1:5000/api/dashboard/stats")
       .then((res) => res.json())
       .then((data) => setStats(data))
       .catch((err) => console.error("Error fetching stats:", err));
 
+    // Fetch low stock products
     fetch("http://127.0.0.1:5000/api/dashboard/low-stock")
       .then((res) => res.json())
       .then((data) => setLowStock(data))
       .catch((err) => console.error("Error fetching low stock:", err));
 
-    // Fetch categories (if still needed for other dashboard features)
+    // Fetch categories
     fetch("http://127.0.0.1:5000/api/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch((err) => console.error("Error fetching categories:", err));
-  
-       fetch("http://localhost:5000/orders")
-    .then((res) => res.json())
-    .then((orders) => {
-      // Map your orders to the format expected in the UI
-      const recentOrders = orders.map((o) => ({
-        orderId: o.id,
-        customerName: o.customerName || "Unknown", // fallback if customerName missing
-        totalPrice: o.totalPrice || 0,
-        status: o.status || "Pending",
-      }));
-      setStats((prev) => ({ ...prev, recentOrders }));
-    })
-    .catch((err) => console.error("Error fetching recent orders:", err));
-}, []);
+
+    // Fetch recent orders
+    fetch("http://127.0.0.1:5000/orders")
+      .then((res) => res.json())
+      .then((orders) => {
+        setOrdersData(orders);
+        const recentOrders = orders.map((o) => ({
+          orderId: o.id,
+          customerName: o.customerName || "Unknown",
+          totalPrice: o.totalPrice || 0,
+          status: o.status || "Pending",
+        }));
+        setStats((prev) => ({ ...prev, recentOrders }));
+      })
+      .catch((err) => console.error("Error fetching recent orders:", err));
+
+    // Fetch toppings
+    fetch("http://127.0.0.1:5000/toppings/")
+      .then((res) => res.json())
+      .then((data) => setToppings(data))
+      .catch((err) => console.error("Error fetching toppings:", err));
+  }, []);
+
+  // Pie chart data for toppings
+  const pieData = {
+    labels: toppings.map((t) => t.name),
+    datasets: [
+      {
+        label: "Topping Stock",
+        data: toppings.map((t) => t.stock),
+        backgroundColor: [
+          "#D9A066", // Pearl
+          "#F6E0B5", // Nata de Coco
+          "#CFA07D", // Pudding
+          "#B08B69", // Cheese Foam
+          "#E1C699", 
+          "#D1B399",
+          "#F3E3D1",
+        ],
+        borderColor: "#fff",
+        borderWidth: 2,
+      },
+    ],
+  };
+
+   // Line chart for top products quantity per week
+  const lineData = {
+    labels: stats.topProducts.map(p => p.name),
+    datasets: [{
+      label: "Quantity Sold (per week)",
+      data: stats.topProducts.map(p => p.weeklyQuantity || 0),
+      fill: false,
+      borderColor: "#CFA07D",
+      backgroundColor: "#B08B69",
+      tension: 0.4, // zigzag/curvy line
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointBackgroundColor: "#D9A066",
+    }],
+  };
 
   return (
     <div className="dashboard-wrapper">
@@ -89,51 +152,16 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Top Selling Products */}
+        {/* Charts */}
         <div className="charts-container">
           <div className="chart-card">
-            <h3>Top Selling Products</h3>
-            <div className="bar-chart">
-              {stats.topProducts?.length > 0 ? (
-                stats.topProducts.map((product, i) => (
-                  <div className="bar" key={i}>
-                    <span>{product.name}</span>
-                    <div
-                      className="bar-fill"
-                      style={{ width: `${product.percentage}%` }}
-                    ></div>
-                  </div>
-                ))
-              ) : (
-                <p>No product data</p>
-              )}
-            </div>
+            <h3>Top Selling Products (Weekly)</h3>
+            {stats.topProducts.length > 0 ? <Line data={lineData} /> : <p>No product data</p>}
           </div>
 
-          <div className="chart-card small-chart">
-            <h3>Sales Over Time</h3>
-            <div className="line-chart">
-              <svg viewBox="0 0 200 120">
-                <polyline
-                  fill="none"
-                  stroke="#ff7fbf"
-                  strokeWidth="3"
-                  points="20,100 60,80 100,60 140,40 180,20"
-                />
-                <circle cx="20" cy="100" r="3" fill="#ff7fbf" />
-                <circle cx="60" cy="80" r="3" fill="#ff7fbf" />
-                <circle cx="100" cy="60" r="3" fill="#ff7fbf" />
-                <circle cx="140" cy="40" r="3" fill="#ff7fbf" />
-                <circle cx="180" cy="20" r="3" fill="#ff7fbf" />
-              </svg>
-              <div className="chart-labels">
-                <span>Jan</span>
-                <span>Feb</span>
-                <span>Mar</span>
-                <span>Apr</span>
-                <span>May</span>
-              </div>
-            </div>
+          <div className="chart-card">
+            <h3>All Toppings Stock</h3>
+            {toppings.length > 0 ? <Pie data={pieData} /> : <p>No toppings available</p>}
           </div>
         </div>
 
@@ -166,13 +194,8 @@ export default function AdminDashboard() {
 
         {/* Recent Orders + Business Management */}
         <div className="orders-management-container">
-
-          {/* =========================================================
-              =============== UPDATED RECENT ORDERS UI ===============
-              ========================================================= */}
           <div className="recent-orders">
             <h3 className="recent-title">Recent Orders</h3>
-
             <div className="recent-card">
               {stats.recentOrders?.length > 0 ? (
                 stats.recentOrders.map((order, i) => (
@@ -213,38 +236,29 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-         {showAddProductModal && (
-      <AddProductModal
-        categories={categories}
-        onClose={() => setShowAddProductModal(false)}
-        onSubmit={(newProduct) => {
-          console.log("New Product Submitted:", newProduct);
-          setShowAddProductModal(false);
-          // Call your API here to save product
-        }}
-      />
-    )}
 
-      {showAddCategoryModal && (
-          <AddCategoryModal
-            onClose={() => setShowAddCategoryModal(false)}
-            onSubmit={(newCategory) => {
-              console.log("New Category Submitted:", newCategory);
-              setShowAddCategoryModal(false);
-            }}
+        {/* Modals */}
+        {showAddProductModal && (
+          <AddProductModal
+            categories={categories}
+            onClose={() => setShowAddProductModal(false)}
           />
         )}
+
+        {showAddCategoryModal && (
+          <AddCategoryModal
+            onClose={() => setShowAddCategoryModal(false)}
+          />
+        )}
+
         {showAddToppingModal && (
           <AddToppingModal
             onClose={() => setShowAddToppingModal(false)}
-            onSubmit={(newTopping) => {
-              console.log("New Topping Submitted:", newTopping);
-              setShowAddToppingModal(false);
-            }}
           />
         )}
-
       </div>
+    
+
 
 
       {/* Embedded Milk Tea Theme CSS */}
