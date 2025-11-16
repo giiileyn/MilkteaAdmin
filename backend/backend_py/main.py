@@ -31,6 +31,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -46,6 +47,7 @@ from app.crud import category as category_crud
 app.include_router(products_router, prefix="/products", tags=["Products"])
 app.include_router(category_router, prefix="/categories", tags=["Categories"])
 app.include_router(orders_router, prefix="/orders", tags=["Orders"])
+
 
 
 
@@ -134,4 +136,5 @@ async def get_categories():
     cursor = db.categories.find({}, {"_id": 1, "name": 1})
     categories = [{"id": str(c["_id"]), "name": c["name"]} async for c in cursor]
     return categories
+
 

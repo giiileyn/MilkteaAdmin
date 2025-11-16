@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js";
 import productRoutes from "./routes/product.js";
 import categoryRoutes from "./routes/category.js";
 import toppingsRoutes from "./routes/topping.js";
+import orderRoutes from "./routes/order.js";
 
 const app = express();
 const PORT = 4000;
@@ -16,6 +17,7 @@ app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/add_toppings", toppingsRoutes);
+app.use("/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is working!");
