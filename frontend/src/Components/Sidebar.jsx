@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaUsers, FaUser, FaShoppingCart } from "react-icons/fa";
 import { MdInventory2, MdKeyboardArrowDown } from "react-icons/md";
 import { GiCupcake } from "react-icons/gi";
@@ -6,7 +7,10 @@ import { BiCategoryAlt } from "react-icons/bi";
 
 const Sidebar = () => {
   const [openInventory, setOpenInventory] = useState(true);
-  const [active, setActive] = useState("Inventory");
+  const location = useLocation();
+
+  // Determine active based on current path
+  const active = location.pathname;
 
   return (
     <div
@@ -22,19 +26,17 @@ const Sidebar = () => {
         flexDirection: "column",
       }}
     >
-      {/* Menu Item */}
       <MenuItem
         icon={<FaHome size={20} />}
         label="Home"
-        active={active}
-        onClick={() => setActive("Home")}
+        to="/admin"
+        active={active === "/admin"}
       />
-
       <MenuItem
         icon={<FaUsers size={20} />}
         label="Customers"
-        active={active}
-        onClick={() => setActive("Customers")}
+        to="/customer"
+        active={active === "/customer"}
       />
 
       {/* Inventory Dropdown */}
@@ -47,10 +49,9 @@ const Sidebar = () => {
           gap: "12px",
           padding: "12px 20px",
           cursor: "pointer",
-          backgroundColor: active === "Inventory" ? "#FFF4E6" : "transparent",
-          color: active === "Inventory" ? "#4E342E" : "#FFEFD9",
-          borderLeft:
-            active === "Inventory" ? "5px solid #FFB6C1" : "5px solid transparent",
+          backgroundColor: active.includes("/product") || active.includes("/categories") ? "#FFF4E6" : "transparent",
+          color: active.includes("/product") || active.includes("/categories") ? "#4E342E" : "#FFEFD9",
+          borderLeft: active.includes("/product") || active.includes("/categories") ? "5px solid #FFB6C1" : "5px solid transparent",
           transition: "0.2s",
         }}
       >
@@ -66,82 +67,80 @@ const Sidebar = () => {
         />
       </div>
 
-      {/* Dropdown Items */}
       {openInventory && (
         <div style={{ marginLeft: "40px", marginTop: "5px" }}>
           <DropdownItem
             icon={<GiCupcake size={20} />}
             label="Products"
-            active={active}
-            onClick={() => setActive("Products")}
+            to="/product"
+            active={active === "/product"}
           />
           <DropdownItem
             icon={<BiCategoryAlt size={20} />}
             label="Categories"
-            active={active}
-            onClick={() => setActive("Categories")}
+            to="/categories"
+            active={active === "/categories"}
           />
         </div>
       )}
 
-      {/* Orders */}
       <MenuItem
         icon={<FaShoppingCart size={20} />}
         label="Orders"
-        active={active}
-        onClick={() => setActive("Orders")}
+        to="/order"
+        active={active === "/order"}
       />
 
-      {/* Profile */}
       <MenuItem
         icon={<FaUser size={20} />}
         label="Profile"
-        active={active}
-        onClick={() => setActive("Profile")}
+        to="/profile"
+        active={active === "/profile"}
       />
     </div>
   );
 };
 
 /* COMPONENTS -------------------------------------------------- */
-const MenuItem = ({ icon, label, active, onClick }) => (
-  <div
-    onClick={onClick}
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      padding: "12px 20px",
-      cursor: "pointer",
-      backgroundColor: active === label ? "#FFF4E6" : "transparent",
-      color: active === label ? "#4E342E" : "#FFEFD9",
-      borderLeft:
-        active === label ? "5px solid #FFB6C1" : "5px solid transparent",
-      transition: "0.2s",
-    }}
-  >
-    {icon}
-    <span style={{ fontWeight: 600 }}>{label}</span>
-  </div>
+const MenuItem = ({ icon, label, to, active }) => (
+  <Link to={to} style={{ textDecoration: "none" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: "12px 20px",
+        cursor: "pointer",
+        backgroundColor: active ? "#FFF4E6" : "transparent",
+        color: active ? "#4E342E" : "#FFEFD9",
+        borderLeft: active ? "5px solid #FFB6C1" : "5px solid transparent",
+        transition: "0.2s",
+      }}
+    >
+      {icon}
+      <span style={{ fontWeight: 600 }}>{label}</span>
+    </div>
+  </Link>
 );
 
-const DropdownItem = ({ icon, label, active, onClick }) => (
-  <div
-    onClick={onClick}
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      padding: "10px 0",
-      cursor: "pointer",
-      color: active === label ? "#FFB6C1" : "#FFEFD9",
-      fontWeight: active === label ? "700" : "500",
-      transition: "0.2s",
-    }}
-  >
-    {icon}
-    <span>{label}</span>
-  </div>
+const DropdownItem = ({ icon, label, to, active }) => (
+  <Link to={to} style={{ textDecoration: "none" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        padding: "10px 0",
+        cursor: "pointer",
+        color: active ? "#FFB6C1" : "#FFEFD9",
+        fontWeight: active ? "700" : "500",
+        transition: "0.2s",
+      }}
+    >
+      {icon}
+      <span>{label}</span>
+    </div>
+  </Link>
 );
 
 export default Sidebar;

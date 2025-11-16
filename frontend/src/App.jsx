@@ -8,6 +8,7 @@ import Product from "./Page/Product";
 import Order from "./Page/Order";
 import Receipt from "./Page/Receipt";
 import Customer from "./Page/Customer";
+import Category from "./Page/Category";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/order" element={ <Layout> <Order /></Layout> }/>
         <Route path="/receipt" element={ <Layout> <Receipt /></Layout> }/>
         <Route path="/customer" element={ <Layout> <Customer /></Layout> }/>
+        <Route path="/category" element={ <Layout> <Category /></Layout> }/>
 
       </Routes>
     </Router>

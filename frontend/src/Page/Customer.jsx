@@ -27,6 +27,26 @@ const Customer = () => {
     fetchCustomers();
   }, []);
 
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+  try {
+    const res = await axios.delete(`http://127.0.0.1:5000/users/${id}`);
+    if (res.data.success) {
+      
+      setCustomers(customers.filter((c) => c.id !== id));
+      alert(res.data.message || "User deleted successfully");
+    } else {
+      alert("Failed to delete user");
+    }
+  } catch (error) {
+    console.error("Delete failed:", error.response?.data || error);
+    alert(error.response?.data?.detail || "Failed to delete user");
+  }
+};
+
+
+
   return (
     <div
       className="p-6"
@@ -80,9 +100,13 @@ const Customer = () => {
                 <button className="p-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
                   <FaEdit />
                 </button>
-                <button className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200">
-                  <FaTrash />
+                <button
+                className="p-2 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                onClick={() => handleDelete(c.id)}
+                >
+                <FaTrash />
                 </button>
+
               </td>
             </tr>
           ))}
