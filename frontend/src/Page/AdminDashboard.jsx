@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,8 +10,8 @@ import {
   BarElement,
 } from "chart.js";
 import AddProductModal from "./AddProductModal";
-import AddCategoryModal from "./AddCategoryModal"; 
-import AddToppingModal from "./AddToppingModal"; 
+import AddCategoryModal from "./AddCategoryModal";
+import AddToppingModal from "./AddToppingModal";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -35,19 +35,25 @@ export default function AdminDashboard() {
     // Fetch dashboard stats
     fetch("http://127.0.0.1:5000/api/dashboard/stats")
       .then((res) => res.json())
-      .then((data) => setStats(prev => ({
-        ...prev,
-        orders: data.orders,
-        users: data.users,
-        products: data.products,
-        totalRevenue: data.totalRevenue
-      })))
+      .then((data) =>
+        setStats((prev) => ({
+          ...prev,
+          orders: data.orders,
+          users: data.users,
+          products: data.products,
+          totalRevenue: data.totalRevenue,
+        }))
+      )
       .catch((err) => console.error("Error fetching stats:", err));
 
     // Fetch low stock products
-    fetch("http://127.0.0.1:5000/api/dashboard/low-stock")
+    fetch("http://127.0.0.1:5000/stock/")
       .then((res) => res.json())
-      .then((data) => setLowStock(data))
+      .then((data) => {
+        // Filter low stock ≤ 5
+        const low = data.filter((p) => p.stock <= 5);
+        setLowStock(low);
+      })
       .catch((err) => console.error("Error fetching low stock:", err));
 
     // Fetch categories
@@ -63,60 +69,69 @@ export default function AdminDashboard() {
       .catch((err) => console.error("Error fetching toppings:", err));
 
     // Fetch orders and process recentOrders + topProducts
-    // Fetch orders and process recentOrders + topProducts
-fetch("http://localhost:4000/orders")
-  .then(res => res.json())
-  .then(orders => {
-    // Map recent orders properly
-    const recentOrders = orders.map(o => ({
-      orderId: o.id,
-      customerName: o.customer?.name || "Unknown",
-      totalPrice: o.totalPrice || 0,
-      status: o.status || "Pending",
-      productList: o.products?.map(p => `${p.name} x${p.quantity}`).join(", ") || "",
-      date: o.date ? new Date(o.date).toLocaleDateString() : ""
-    }));
+    fetch("http://localhost:4000/orders")
+      .then((res) => res.json())
+      .then((orders) => {
+        const recentOrders = orders.map((o) => ({
+          orderId: o.id,
+          customerName: o.customer?.name || "Unknown",
+          totalPrice: o.totalPrice || 0,
+          status: o.status || "Pending",
+          productList:
+            o.products?.map((p) => `${p.name} x${p.quantity}`).join(", ") || "",
+          date: o.date ? new Date(o.date).toLocaleDateString() : "",
+        }));
 
-    // Aggregate top products
-    const productMap = {};
-    orders.forEach(order => {
-      order.products?.forEach(p => {
-        if (!productMap[p.name]) productMap[p.name] = 0;
-        productMap[p.name] += p.quantity || 0;
-      });
-    });
+        const productMap = {};
+        orders.forEach((order) => {
+          order.products?.forEach((p) => {
+            if (!productMap[p.name]) productMap[p.name] = 0;
+            productMap[p.name] += p.quantity || 0;
+          });
+        });
 
-    const topProducts = Object.keys(productMap)
-      .map(name => ({ name, totalQuantity: productMap[name] }))
-      .sort((a, b) => b.totalQuantity - a.totalQuantity)
-      .slice(0, 5);
+        const topProducts = Object.keys(productMap)
+          .map((name) => ({ name, totalQuantity: productMap[name] }))
+          .sort((a, b) => b.totalQuantity - a.totalQuantity)
+          .slice(0, 5);
 
-    setStats(prev => ({ ...prev, recentOrders, topProducts }));
-  })
-  .catch(err => console.error("Error fetching orders:", err));
-
+        setStats((prev) => ({ ...prev, recentOrders, topProducts }));
+      })
+      .catch((err) => console.error("Error fetching orders:", err));
   }, []);
 
   // Pie chart data for toppings
   const pieData = {
-    labels: toppings.map(t => t.name),
-    datasets: [{
-      label: "Topping Stock",
-      data: toppings.map(t => t.stock),
-      backgroundColor: ["#D9A066","#F6E0B5","#CFA07D","#B08B69","#E1C699","#D1B399","#F3E3D1"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }]
+    labels: toppings.map((t) => t.name),
+    datasets: [
+      {
+        label: "Topping Stock",
+        data: toppings.map((t) => t.stock),
+        backgroundColor: [
+          "#D9A066",
+          "#F6E0B5",
+          "#CFA07D",
+          "#B08B69",
+          "#E1C699",
+          "#D1B399",
+          "#F3E3D1",
+        ],
+        borderColor: "#fff",
+        borderWidth: 2,
+      },
+    ],
   };
 
   // Bar chart data for top products
   const topProductChartData = {
-    labels: stats.topProducts.map(p => p.name),
-    datasets: [{
-      label: "Units Sold",
-      data: stats.topProducts.map(p => p.totalQuantity),
-      backgroundColor: ["#CFA07D","#B08B69","#D9A066","#F6E0B5","#F3E3D1"],
-    }]
+    labels: stats.topProducts.map((p) => p.name),
+    datasets: [
+      {
+        label: "Units Sold",
+        data: stats.topProducts.map((p) => p.totalQuantity),
+        backgroundColor: ["#CFA07D", "#B08B69", "#D9A066", "#F6E0B5", "#F3E3D1"],
+      },
+    ],
   };
 
   return (
@@ -161,7 +176,11 @@ fetch("http://localhost:4000/orders")
         <div className="charts-container">
           <div className="chart-card">
             <h3>Top Selling Products</h3>
-            {stats.topProducts.length > 0 ? <Bar data={topProductChartData} /> : <p>No product data</p>}
+            {stats.topProducts.length > 0 ? (
+              <Bar data={topProductChartData} />
+            ) : (
+              <p>No product data</p>
+            )}
           </div>
 
           <div className="chart-card">
@@ -185,7 +204,7 @@ fetch("http://localhost:4000/orders")
                 lowStock.map((item, i) => (
                   <tr key={i}>
                     <td>{item.name}</td>
-                    <td>{item.quantity}</td>
+                    <td>{item.stock}</td>
                   </tr>
                 ))
               ) : (
@@ -209,12 +228,10 @@ fetch("http://localhost:4000/orders")
                       <div className="recent-id">{order.orderId}</div>
                       <div className="recent-name">{order.customerName}</div>
                     </div>
-
                     <div className="recent-right">
                       <div className="recent-price">
                         ₱{order.totalPrice.toLocaleString()}
                       </div>
-
                       <div
                         className={`recent-status status-${order.status.toLowerCase()}`}
                       >
@@ -232,10 +249,25 @@ fetch("http://localhost:4000/orders")
           <div className="business-management">
             <h3>Business Management</h3>
             <div className="management-buttons">
-              <button className="btn add-product" onClick={() => setShowAddProductModal(true)}> ➕ Add Product </button>
-              <button className="btn add-category" onClick={() => setShowAddCategoryModal(true)}> 🏷 Add Category </button>
-              <button className="btn add-topping" onClick={() => setShowAddToppingModal(true)}>🍬 Add Topping </button>
-              <button className="btn manage-inventory"> 🏷 Manage Inventory </button>
+              <button
+                className="btn add-product"
+                onClick={() => setShowAddProductModal(true)}
+              >
+                ➕ Add Product
+              </button>
+              <button
+                className="btn add-category"
+                onClick={() => setShowAddCategoryModal(true)}
+              >
+                🏷 Add Category
+              </button>
+              <button
+                className="btn add-topping"
+                onClick={() => setShowAddToppingModal(true)}
+              >
+                🍬 Add Topping
+              </button>
+              <button className="btn manage-inventory">🏷 Manage Inventory</button>
               <button className="btn sales-reports">📈 Sales Reports</button>
               <button className="btn customers">👥 Customers</button>
             </div>
@@ -250,21 +282,18 @@ fetch("http://localhost:4000/orders")
           />
         )}
         {showAddCategoryModal && (
-          <AddCategoryModal
-            onClose={() => setShowAddCategoryModal(false)}
-          />
+          <AddCategoryModal onClose={() => setShowAddCategoryModal(false)} />
         )}
         {showAddToppingModal && (
-          <AddToppingModal
-            onClose={() => setShowAddToppingModal(false)}
-          />
+          <AddToppingModal onClose={() => setShowAddToppingModal(false)} />
         )}
       </div>
-    
 
 
 
-      {/* Embedded Milk Tea Theme CSS */}
+
+
+     
       <style>{`
         .dashboard-wrapper {
           width: 100vw;

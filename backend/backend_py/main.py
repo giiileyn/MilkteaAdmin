@@ -41,6 +41,7 @@ from app.routes.products import router as products_router
 from app.routes.category import router as category_router
 from app.routes.order import router as orders_router
 from app.routes import topping
+from app.routes import stock as stock_router
 from app.crud import product as product_crud
 from app.crud import category as category_crud
 
@@ -50,6 +51,7 @@ app.include_router(products_router, prefix="/products", tags=["Products"])
 app.include_router(category_router, prefix="/categories", tags=["Categories"])
 app.include_router(orders_router, prefix="/orders", tags=["Orders"])
 app.include_router(topping.router, prefix="/toppings", tags=["Toppings"])
+app.include_router(stock_router.router, prefix="/stock", tags=["Stock"])
 
 
 
