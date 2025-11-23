@@ -1,27 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState("Account Details"); // Only two tabs now
+  const [activeTab, setActiveTab] = useState("Account Details");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) return;
+ useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (!storedUser) return;
 
-    try {
-      const userObj = JSON.parse(storedUser);
-      setUser(userObj);
-    } catch (err) {
-      console.error("Failed to parse user from localStorage:", err);
+  try {
+    const parsedUser = JSON.parse(storedUser);
+
+    // if somehow `id` is missing, set it from _id
+    if (!parsedUser.id && parsedUser._id) {
+      parsedUser.id = parsedUser._id;
     }
-  }, []);
+
+    setUser(parsedUser);
+  } catch (err) {
+    console.error("Failed to parse user from localStorage:", err);
+  }
+}, []);
+
 
   if (!user) return <p>Loading profile...</p>;
 
@@ -32,17 +41,43 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.clear(); // Clear all localStorage
-    navigate("/"); // Redirect to home/login
+    localStorage.clear();
+    navigate("/");
   };
 
-  const handleProfileUpdate = (e) => {
-    e.preventDefault();
-    // TODO: Add profile update logic here
-    setSuccess("Profile updated successfully!");
-  };
+  // ========== UPDATE PROFILE (name, email, avatar) ==========
+const handleProfileUpdate = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-  const handlePasswordUpdate = (e) => {
+  try {
+    const formData = new FormData();
+    formData.append("name", user.name);
+    formData.append("email", user.email);
+    if (avatarFile) formData.append("avatar", avatarFile);
+
+    const res = await axios.patch(
+      `http://localhost:5000/users/${user.id}`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } } // <-- important
+    );
+
+    if (res.data.success) {
+      setUser(res.data.data);
+      localStorage.setItem("user", JSON.stringify(res.data.data));
+      setAvatarFile(null);
+      setSuccess("Profile updated successfully!");
+    }
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.detail || "Failed to update profile. Try again.");
+  }
+};
+
+
+  // ========== UPDATE PASSWORD ==========
+  const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -52,31 +87,44 @@ export default function Profile() {
       return;
     }
 
-    // TODO: Send password update request to backend
-    setSuccess("Password updated successfully!");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/users/${user.id}/password`,
+        { currentPassword, newPassword }
+      );
+
+      if (res.data.success) {
+        setSuccess("Password updated successfully!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.detail || "Failed to update password");
+    }
   };
 
   return (
     <div className="profile-container">
       <aside className="sidebar">
         <div className="profile-image">
-          <img src={user.avatar || "https://via.placeholder.com/100"} alt="Profile" />
+          <img 
+            src={avatarFile 
+                  ? URL.createObjectURL(avatarFile) 
+                  : (user.avatar 
+                      ? `http://localhost:5000${user.avatar}` 
+                      : "https://via.placeholder.com/100")} 
+            alt="Profile" 
+          />
+
         </div>
         <nav className="sidebar-nav">
           <ul>
-            <li
-              className={activeTab === "Account Details" ? "active" : ""}
-              onClick={() => handleTabClick("Account Details")}
-            >
+            <li className={activeTab === "Account Details" ? "active" : ""} onClick={() => handleTabClick("Account Details")}>
               Account Details
             </li>
-            <li
-              className={activeTab === "Change Password" ? "active" : ""}
-              onClick={() => handleTabClick("Change Password")}
-            >
+            <li className={activeTab === "Change Password" ? "active" : ""} onClick={() => handleTabClick("Change Password")}>
               Change Password
             </li>
             <li onClick={handleLogout}>Logout</li>
@@ -89,12 +137,30 @@ export default function Profile() {
           <>
             <h2>Account Settings</h2>
             {success && <p style={{ color: "green" }}>{success}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <form className="profile-form" onSubmit={handleProfileUpdate}>
               <label>Email address</label>
-              <input type="email" value={user.email || ""} readOnly />
+              <input
+                type="email"
+                value={user.email || ""}
+                onChange={(e) => setUser({ ...user, email: e.target.value })}
+                required
+              />
 
               <label>Full name</label>
-              <input type="text" defaultValue={user.name || ""} />
+              <input
+                type="text"
+                value={user.name || ""}
+                onChange={(e) => setUser({ ...user, name: e.target.value })}
+                required
+              />
+
+              <label>Avatar</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setAvatarFile(e.target.files[0])}
+              />
 
               <button type="submit">Update Profile</button>
             </form>
@@ -108,28 +174,13 @@ export default function Profile() {
             {success && <p style={{ color: "green" }}>{success}</p>}
             <form className="profile-form" onSubmit={handlePasswordUpdate}>
               <label>Current Password</label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-              />
+              <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
 
               <label>New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-              />
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
 
               <label>Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
 
               <button type="submit">Update Password</button>
             </form>
@@ -140,15 +191,7 @@ export default function Profile() {
       <style>{`
         .profile-container { display: flex; font-family: 'Arial'; background: #fff0f5; min-height: 100vh; width: 100vw; overflow-x: hidden; }
         .sidebar { width: 220px; background: #d1a37f; padding: 20px; display: flex; flex-direction: column; align-items: center; color: white; }
-        .profile-image img {
-        width: 120px;        /* fixed width */
-        height: 120px;       /* same as width to keep circle */
-        border-radius: 50%;  /* make it a circle */
-        border: 3px solid #fff;
-        margin-bottom: 20px;
-        object-fit: cover;   /* ensures image covers circle without stretching */
-        }
-
+        .profile-image img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #fff; margin-bottom: 20px; object-fit: cover; }
         .sidebar-nav ul { list-style: none; padding: 0; width: 100%; }
         .sidebar-nav li { padding: 10px 15px; margin: 5px 0; border-radius: 8px; cursor: pointer; transition: background 0.3s; }
         .sidebar-nav li.active, .sidebar-nav li:hover { background: #f3c6a9; color: #333; }

@@ -5,12 +5,28 @@ import { FaSearch } from "react-icons/fa";
 const Header = () => {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  const loadUser = () => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      const userObj = JSON.parse(storedUser);
-      setUser(userObj);
+      setUser(JSON.parse(storedUser));
+    } else {
+      setUser(null);
     }
+  };
+
+  useEffect(() => {
+    // Load user initially
+    loadUser();
+
+    // Listen to storage changes (triggered when avatar updated in Profile)
+    const handleStorageChange = () => {
+      loadUser();
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   return (
@@ -27,8 +43,12 @@ const Header = () => {
       </div>
 
       <div className="header-right">
-        {user ? (
-          <img src={user.avatar} alt="Avatar" className="avatar" />
+        {user && user.avatar ? (
+          <img
+            src={`http://localhost:5000${user.avatar}`}
+            alt="Avatar"
+            className="avatar"
+          />
         ) : (
           <div className="avatar-placeholder" />
         )}
