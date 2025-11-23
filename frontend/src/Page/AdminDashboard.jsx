@@ -134,6 +134,29 @@ export default function AdminDashboard() {
     ],
   };
 
+
+   // Refresh functions for modals
+  const refreshProducts = () => {
+    fetch("http://127.0.0.1:5000/stock/")
+      .then((res) => res.json())
+      .then((data) => {
+        const low = data.filter((p) => p.stock <= 5);
+        setLowStock(low);
+      });
+  };
+
+  const refreshCategories = () => {
+    fetch("http://127.0.0.1:5000/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(data));
+  };
+
+  const refreshToppings = () => {
+    fetch("http://127.0.0.1:5000/toppings/")
+      .then((res) => res.json())
+      .then((data) => setToppings(data));
+  };
+
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-container">
@@ -285,8 +308,12 @@ export default function AdminDashboard() {
           <AddCategoryModal onClose={() => setShowAddCategoryModal(false)} />
         )}
         {showAddToppingModal && (
-          <AddToppingModal onClose={() => setShowAddToppingModal(false)} />
+          <AddToppingModal
+            onClose={() => setShowAddToppingModal(false)}
+            onToppingAdded={refreshToppings}
+          />
         )}
+
       </div>
 
 

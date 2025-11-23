@@ -14,24 +14,26 @@ export default function AddToppingModal({ onClose, onToppingAdded }) {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:4000/toppings", {
+      const response = await fetch("http://localhost:4000/add_toppings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, price, stock, status }),
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        const errData = await response.json().catch(() => ({}));
         throw new Error(errData.message || "Failed to add topping");
       }
 
       const data = await response.json();
-      onToppingAdded(data); // return the new topping to parent
+      onToppingAdded(data);
       onClose();
+
       setName("");
       setPrice(0);
       setStock(0);
       setStatus("available");
+
     } catch (err) {
       setError(err.message);
     } finally {
