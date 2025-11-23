@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import AddProductModal from "./AddProductModal";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("All");
 
   // Fetch products
   const fetchProducts = async () => {
@@ -20,38 +22,31 @@ const Product = () => {
         price: `₱ ${p.price.toFixed(2)}`,
         profit: `₱ 40.00`,
         status:
-          p.status === "available"
-            ? "In Stock"
-            : p.status === "out-of-stock"
+          p.stock === 0
             ? "Out of Stock"
-            : "Low Stock",
+            : p.stock <= 5
+            ? "Low Stock"
+            : "In Stock",
         image: p.image || "/placeholder.png",
       }));
 
       setProducts(formatted);
+      setFilteredProducts(formatted); // show all by default
     } catch (err) {
       console.error("Error fetching products:", err);
     }
   };
 
   // Fetch categories (for modal)
- const fetchCategories = async () => {
-  try {
-    const res = await fetch("http://127.0.0.1:5000/api/categories");
-    const data = await res.json();
-    console.log("Fetched categories:", data);
-
-    setCategories(
-      Array.isArray(data)
-        ? data.map((c) => ({ id: c.id, name: c.name }))
-        : []
-    );
-  } catch (err) {
-    console.error("Error fetching categories:", err);
-  }
-};
-
-
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:5000/api/categories");
+      const data = await res.json();
+      setCategories(Array.isArray(data) ? data.map((c) => ({ id: c.id, name: c.name })) : []);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -71,49 +66,69 @@ const Product = () => {
     }
   };
 
+  const handleFilter = (filter) => {
+    setActiveFilter(filter);
+    if (filter === "All") setFilteredProducts(products);
+    else setFilteredProducts(products.filter((p) => p.status === filter));
+  };
+
   return (
     <div className="product-container">
       <h2>Manage your products</h2>
 
       <div className="search-box">
-        <input type="text" placeholder="Search products.." />
+        <input
+          type="text"
+          placeholder="Search products.."
+          onChange={(e) =>
+            setFilteredProducts(
+              products.filter((p) =>
+                p.name.toLowerCase().includes(e.target.value.toLowerCase())
+              )
+            )
+          }
+        />
       </div>
 
       <div className="filter-row">
-        <button className="filter-btn active">All ({products.length})</button>
+        <button
+          className={`filter-btn ${activeFilter === "All" ? "active" : ""}`}
+          onClick={() => handleFilter("All")}
+        >
+          All ({products.length})
+        </button>
 
-        <button className="filter-btn">
+        <button
+          className={`filter-btn ${activeFilter === "Low Stock" ? "active" : ""}`}
+          onClick={() => handleFilter("Low Stock")}
+        >
           Low Stock ({products.filter((p) => p.status === "Low Stock").length})
         </button>
 
-        <button className="filter-btn">
-          Out of Stock (
-          {products.filter((p) => p.status === "Out of Stock").length})
+        <button
+          className={`filter-btn ${activeFilter === "Out of Stock" ? "active" : ""}`}
+          onClick={() => handleFilter("Out of Stock")}
+        >
+          Out of Stock ({products.filter((p) => p.status === "Out of Stock").length})
         </button>
 
-        {/* ADD PRODUCT MODAL BUTTON */}
         <button className="add-btn" onClick={() => setShowModal(true)}>
           + Add Product
         </button>
       </div>
 
       <div className="product-list">
-        {products.map((p) => (
+        {filteredProducts.map((p) => (
           <div key={p.id} className="product-card">
             <img src={p.image} className="product-img" alt={p.name} />
-
             <div className="product-info">
               <h3>{p.name}</h3>
               <span className="category">{p.category}</span>
-              <p className="stock">Stock: {p.stock} kg</p>
+              <p className="stock">Stock: {p.stock}</p>
               <p className="price">{p.price}</p>
             </div>
-
             <div className="right-info">
-              <span
-                className="status"
-                style={{ backgroundColor: getStatusColor(p.status) }}
-              >
+              <span className="status" style={{ backgroundColor: getStatusColor(p.status) }}>
                 {p.status}
               </span>
               <p className="profit">Profit: {p.profit}</p>
@@ -122,18 +137,17 @@ const Product = () => {
         ))}
       </div>
 
-      {/* SHOW MODAL (WITH CATEGORIES PASSED) */}
       {showModal && (
         <AddProductModal
           categories={categories}
           onClose={() => {
             setShowModal(false);
-            fetchProducts(); // refresh after adding
+            fetchProducts();
           }}
         />
       )}
 
-      {/* STYLES (UNCHANGED) */}
+    
       <style>{`
         .product-container {
           padding: 30px;

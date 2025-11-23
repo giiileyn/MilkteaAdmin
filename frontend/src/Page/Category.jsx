@@ -1,45 +1,33 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import AddCategoryModal from "./AddCategoryModal"; // import your modal
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
-  
-  useEffect(() => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/categories/");
-      
-      
-      console.log("API response:", response.data);
-
-      // Handle both possible formats
       const categoriesData = Array.isArray(response.data)
         ? response.data
         : response.data.data || [];
-
       setCategories(categoriesData);
-      console.log("Categories in state:", categoriesData);
-
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
-  fetchCategories();
-}, []);
-
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Active":
-        return "#7BBF84";
-      case "Low Stock":
-        return "#E3B341";
-      case "Out of Stock":
-        return "#D26A5B";
-      default:
-        return "#A67C52";
+      case "Active": return "#7BBF84";
+      case "Low Stock": return "#E3B341";
+      case "Out of Stock": return "#D26A5B";
+      default: return "#A67C52";
     }
   };
 
@@ -55,25 +43,33 @@ const Category = () => {
         <button className="filter-btn active">All ({categories.length})</button>
         <button className="filter-btn">Low Stock</button>
         <button className="filter-btn">Out of Stock</button>
-        <button className="add-btn">+ Add Category</button>
+        <button className="add-btn" onClick={() => setShowModal(true)}>+ Add Category</button>
       </div>
 
       <div className="category-list">
         {categories.map((c) => (
-            <div key={c.id} className="category-card">
+          <div key={c.id} className="category-card">
             <div>
-                <h3>{c.name}</h3>
-                <p>Total Products: {c.total_products || 0}</p>
+              <h3>{c.name}</h3>
+              <p>Total Products: {c.total_products || 0}</p>
             </div>
             <span
-                className="status"
-                style={{ backgroundColor: getStatusColor(c.status || "Active") }}
+              className="status"
+              style={{ backgroundColor: getStatusColor(c.status || "Active") }}
             >
-                {c.status || "Active"}
+              {c.status || "Active"}
             </span>
-            </div>
+          </div>
         ))}
-        </div>
+      </div>
+
+      {/* Render the AddCategoryModal when showModal is true */}
+      {showModal && (
+        <AddCategoryModal
+          onClose={() => setShowModal(false)}
+          onCategoryAdded={fetchCategories} 
+        />
+      )}
 
 
       <style>{`
