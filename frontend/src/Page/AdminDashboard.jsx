@@ -13,6 +13,11 @@ import AddProductModal from "./AddProductModal";
 import AddCategoryModal from "./AddCategoryModal";
 import AddToppingModal from "./AddToppingModal";
 
+import cartIcon from "../assets/cart.svg";
+import usersIcon from "../assets/users.svg";
+import cupIcon from "../assets/cup.svg";
+import moneyIcon from "../assets/money.svg";
+
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 export default function AdminDashboard() {
@@ -163,36 +168,48 @@ export default function AdminDashboard() {
         {/* Top Stats */}
         <div className="stats-container">
           <div className="stat-card orders">
-            <div className="stat-icon">🛒</div>
-            <div className="stat-info">
-              <h2>{stats.orders}</h2>
-              <p>Orders</p>
-            </div>
+          <div className="stat-icon">
+            <img
+              src={cartIcon}
+              alt="Cart"
+              style={{ width: "45px", height: "45px" }}
+            />
           </div>
+          <div className="stat-info">
+            <h2>{stats.orders}</h2>
+            <p>Orders</p>
+          </div>
+        </div>
 
           <div className="stat-card users">
-            <div className="stat-icon">👥</div>
-            <div className="stat-info">
-              <h2>{stats.users}</h2>
-              <p>Customers</p>
-            </div>
+          <div className="stat-icon">
+            <img src={usersIcon} alt="Users" style={{ width: "45px", height: "45px" }} />
           </div>
+          <div className="stat-info">
+            <h2>{stats.users}</h2>
+            <p>Customers</p>
+          </div>
+        </div>
 
           <div className="stat-card products">
-            <div className="stat-icon">🥤</div>
-            <div className="stat-info">
-              <h2>{stats.products}</h2>
-              <p>Products</p>
-            </div>
+          <div className="stat-icon">
+            <img src={cupIcon} alt="Products" style={{ width: "45px", height: "45px" }} />
           </div>
+          <div className="stat-info">
+            <h2>{stats.products}</h2>
+            <p>Products</p>
+          </div>
+        </div>
 
           <div className="stat-card revenue">
-            <div className="stat-icon">💰</div>
-            <div className="stat-info">
-              <h2>${stats.totalRevenue.toLocaleString()}</h2>
-              <p>Total Revenue</p>
-            </div>
-          </div>
+        <div className="stat-icon">
+          <img src={moneyIcon} alt="Revenue" style={{ width: "45px", height: "45px" }} />
+        </div>
+        <div className="stat-info">
+          <h2>${stats.totalRevenue.toLocaleString()}</h2>
+          <p>Total Revenue</p>
+        </div>
+      </div>
         </div>
 
         {/* Charts */}

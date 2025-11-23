@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Receipt from "./Receipt"; // import your Receipt component
 
@@ -7,6 +7,12 @@ export default function Order() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null); // for receipt
+
+  // EDIT HANDLER
+  const handleEdit = (order) => {
+    console.log("Edit order clicked:", order);
+    // TODO: open modal or dropdown to update status
+  };
 
   // Fetch orders from backend
   useEffect(() => {
@@ -58,10 +64,24 @@ export default function Order() {
         .order-header { display: flex; justify-content: space-between; align-items: center; padding-right: 20px; }
         .order-header h3 { margin: 0; color: #5A4632; }
         .order-date { color: #8C7B6A; font-size: 14px; }
-        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: capitalize; margin-right: 20px; }
+        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: capitalize; margin-right: 10px; }
         .status-badge.completed { background: #DDEDD8; color: #4B7C47; }
         .status-badge.pending { background: #FCE7B6; color: #B27A1A; }
-        .status-badge.processing { background: #DFE9FF; color: #345B9C; }
+        .status-badge.cancelled { background: #F7D6D6; color: #B23A3A; }
+
+        .edit-icon {
+          cursor: pointer;
+          font-size: 17px;
+          margin-left: 5px;
+          color: #7A614A;
+          user-select: none;
+          transition: 0.2s;
+        }
+        .edit-icon:hover {
+          color: #4a3729;
+          transform: scale(1.15);
+        }
+
         .order-items { margin: 15px 0; }
         .order-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 10px; }
         .order-item span { color: #5A4632; font-size: 15px; }
@@ -80,20 +100,14 @@ export default function Order() {
       <div className="order-page-container">
         {/* FILTER TABS */}
         <div className="order-tabs">
-          {["All", "Pending", "Processing", "Completed"].map((t) => (
+          {["All", "Pending", "Completed", "Cancelled"].map((t) => (
             <button
-              className="btn receipt"
-              onClick={() => {
-                if (order.status.toLowerCase() === "completed") {
-                  setSelectedOrder(order); // show receipt
-                } else {
-                  alert("This order is still processing."); // show message
-                }
-              }}
+              key={t}
+              className={`order-tab ${tab === t ? "active" : ""}`}
+              onClick={() => setTab(t)}
             >
-              Receipt
+              {t}
             </button>
-
           ))}
         </div>
 
@@ -108,9 +122,20 @@ export default function Order() {
                   <h3>ORD-{String(order.id).padStart(3, "0")}</h3>
                   <span className="order-date">{order.date}</span>
                 </div>
-                <span className={`status-badge ${order.status.toLowerCase()}`}>
-                  {order.status}
-                </span>
+
+                {/* STATUS + EDIT ICON (FOR PENDING ONLY) */}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <span className={`status-badge ${order.status.toLowerCase()}`}>
+                    {order.status}
+                  </span>
+
+                  {/* Pencil icon for pending */}
+                  {order.status.toLowerCase() === "pending" && (
+                    <span className="edit-icon" onClick={() => handleEdit(order)}>
+                      🖉
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="order-items">
@@ -128,27 +153,24 @@ export default function Order() {
               </div>
 
               <div className="order-footer">
-              <div>
-                <small>Total Amount</small>
-                <h3>₱ {order.total.toLocaleString()}</h3>
-              </div>
-              <div>
-                <button className="btn details">Details</button>
-                <button
-                  className="btn receipt"
-                  onClick={() => {
-                    if (order.status.toLowerCase() === "completed") {
-                      setSelectedOrder(order);
-                    } else {
-                      alert("This order is still processing.");
-                    }
-                  }}
-                >
-                  Receipt
-                </button>
-              </div>
-            </div>
+                <div>
+                  <small>Total Amount</small>
+                  <h3>₱ {order.total.toLocaleString()}</h3>
+                </div>
 
+                <div>
+                  <button className="btn details">Details</button>
+
+                  {order.status.toLowerCase() === "completed" && (
+                    <button
+                      className="btn receipt"
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      Receipt
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           ))
         )}

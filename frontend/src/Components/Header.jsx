@@ -1,11 +1,12 @@
 import React from "react";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
+import logo from "../assets/milkymood.jpg"; // adjust path relative to Header.jsx
 
 const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <FaUserCircle className="profile-icon" />
+        <img src={logo} alt="Logo" className="logo" />
       </div>
 
       <div className="header-center">
@@ -13,12 +14,6 @@ const Header = () => {
           <input type="text" placeholder="Search..." />
           <FaSearch className="search-icon" />
         </div>
-        <nav className="nav-links">
-          <a href="/">Home</a>
-          <a href="/about">About</a>
-          <a href="/users">Users</a>
-          <a href="/products">Products</a>
-        </nav>
       </div>
 
       <div className="header-right">
@@ -30,10 +25,17 @@ const Header = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 10px 50px; /* More side padding for spacious look */
+          padding: 10px 50px;
           background-color: #3e2c26;
           color: #e0d6c1;
           font-family: Arial, sans-serif;
+        }
+
+        .logo {
+          height: 80px;
+          width: 80px; /* make it square */
+          border-radius: 50%; /* make it circular */
+          object-fit: cover; /* ensures image fits nicely */
         }
 
         .profile-icon {
@@ -44,15 +46,15 @@ const Header = () => {
         .header-center {
           display: flex;
           flex-direction: column;
-          flex: 1; /* Take up remaining space */
+          flex: 1;
           margin: 0 30px;
-          align-items: stretch; /* Make children span full width */
+          align-items: stretch;
         }
 
         .search-container {
           position: relative;
-          width: 100%; /* Full width inside center */
-          max-width: 600px; /* Optional: limit max width */
+          width: 100%;
+          max-width: 600px;
           margin-bottom: 10px;
         }
 
@@ -73,25 +75,6 @@ const Header = () => {
           top: 50%;
           transform: translateY(-50%);
           color: #3e2c26;
-        }
-
-        .nav-links {
-          display: flex;
-          justify-content: space-around; /* Spread links evenly */
-          flex-wrap: wrap;
-          gap: 15px;
-        }
-
-        .nav-links a {
-          text-decoration: none;
-          color: #e0d6c1;
-          font-weight: bold;
-          font-size: 16px;
-          transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-          color: #b78563;
         }
 
         @media (max-width: 768px) {

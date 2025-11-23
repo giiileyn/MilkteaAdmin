@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import receiptLogo from "../assets/milkymoodreceipt.png"; // <-- ADD THIS
 
 export default function Receipt({ order }) {
   const receiptRef = useRef(null);
@@ -68,7 +69,7 @@ export default function Receipt({ order }) {
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: "15px" }}>
           <h1 style={{ margin: 0, fontSize: "28px", color: "#B39172" }}>
-            WowMilkteh
+            Milky Mood
           </h1>
           <p style={{ margin: 0, fontSize: "14px", color: "#8C7B6A" }}>
             Thank you for your order!
@@ -119,10 +120,19 @@ export default function Receipt({ order }) {
           <span>₱ {order.total.toLocaleString()}</span>
         </div>
 
-        {/* Footer */}
+        {/* Footer Text */}
         <div style={{ textAlign: "center", fontSize: "12px", color: "#8C7B6A" }}>
           <p>Visit us again at WowMilkteh!</p>
           <p>Enjoy your drink!</p>
+        </div>
+
+        {/* === IMAGE AT THE BOTTOM === */}
+        <div style={{ textAlign: "center", marginTop: "15px" }}>
+          <img
+            src={receiptLogo}
+            alt="Milky Mood Receipt Logo"
+            style={{ width: "120px", opacity: 0.9 }}
+          />
         </div>
       </div>
     </div>

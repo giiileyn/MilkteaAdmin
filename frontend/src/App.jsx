@@ -9,6 +9,7 @@ import Order from "./Page/Order";
 import Receipt from "./Page/Receipt";
 import Customer from "./Page/Customer";
 import Category from "./Page/Category";
+import Profile from "./Page/Profile";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/receipt" element={ <Layout> <Receipt /></Layout> }/>
         <Route path="/customer" element={ <Layout> <Customer /></Layout> }/>
         <Route path="/category" element={ <Layout> <Category /></Layout> }/>
+        <Route path="/profile" element={ <Layout> <Profile /></Layout> }/>
 
       </Routes>
     </Router>

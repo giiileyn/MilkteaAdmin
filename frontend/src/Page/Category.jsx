@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import AddCategoryModal from "./AddCategoryModal"; // import your modal
+import AddCategoryModal from "./AddCategoryModal";
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("All"); // Track which filter is active
+  const [searchQuery, setSearchQuery] = useState(""); // Track search input
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/categories/");
+      const response = await axios.get("http://localhost:5000/count/categories/count");
       const categoriesData = Array.isArray(response.data)
         ? response.data
         : response.data.data || [];
       setCategories(categoriesData);
+      setFilteredCategories(categoriesData); // default to all
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -21,6 +25,36 @@ const Category = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Filter based on activeFilter AND searchQuery
+  const applyFilters = (filter = activeFilter, query = searchQuery) => {
+    let filtered = categories;
+
+    // Filter by stock
+    if (filter === "Low Stock") {
+      filtered = filtered.filter(c => c.total_products > 0 && c.total_products <= 5);
+    } else if (filter === "Out of Stock") {
+      filtered = filtered.filter(c => c.total_products === 0);
+    }
+
+    // Filter by search query
+    if (query) {
+      filtered = filtered.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+    }
+
+    setFilteredCategories(filtered);
+  };
+
+  const handleFilterClick = (filter) => {
+    setActiveFilter(filter);
+    applyFilters(filter, searchQuery);
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    applyFilters(activeFilter, query);
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -36,18 +70,43 @@ const Category = () => {
       <h2>Manage your categories</h2>
 
       <div className="search-box">
-        <input type="text" placeholder="Search categories.." />
+        <input
+          type="text"
+          placeholder="Search categories.."
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
       </div>
 
       <div className="filter-row">
-        <button className="filter-btn active">All ({categories.length})</button>
-        <button className="filter-btn">Low Stock</button>
-        <button className="filter-btn">Out of Stock</button>
-        <button className="add-btn" onClick={() => setShowModal(true)}>+ Add Category</button>
+        <button
+          className={`filter-btn ${activeFilter === "All" ? "active" : ""}`}
+          onClick={() => handleFilterClick("All")}
+        >
+          All ({categories.length})
+        </button>
+
+        <button
+          className={`filter-btn ${activeFilter === "Low Stock" ? "active" : ""}`}
+          onClick={() => handleFilterClick("Low Stock")}
+        >
+          Low Stock ({categories.filter(c => c.total_products > 0 && c.total_products <= 5).length})
+        </button>
+
+        <button
+          className={`filter-btn ${activeFilter === "Out of Stock" ? "active" : ""}`}
+          onClick={() => handleFilterClick("Out of Stock")}
+        >
+          Out of Stock ({categories.filter(c => c.total_products === 0).length})
+        </button>
+
+        <button className="add-btn" onClick={() => setShowModal(true)}>
+          + Add Category
+        </button>
       </div>
 
       <div className="category-list">
-        {categories.map((c) => (
+        {filteredCategories.map((c) => (
           <div key={c.id} className="category-card">
             <div>
               <h3>{c.name}</h3>
@@ -55,15 +114,19 @@ const Category = () => {
             </div>
             <span
               className="status"
-              style={{ backgroundColor: getStatusColor(c.status || "Active") }}
+              style={{
+                backgroundColor:
+                  c.total_products === 0 ? getStatusColor("Out of Stock") :
+                  c.total_products <= 5 ? getStatusColor("Low Stock") :
+                  getStatusColor("Active")
+              }}
             >
-              {c.status || "Active"}
+              {c.total_products === 0 ? "Out of Stock" : c.total_products <= 5 ? "Low Stock" : "Active"}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Render the AddCategoryModal when showModal is true */}
       {showModal && (
         <AddCategoryModal
           onClose={() => setShowModal(false)}
