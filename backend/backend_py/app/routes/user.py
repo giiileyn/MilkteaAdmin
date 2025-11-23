@@ -8,7 +8,9 @@ from passlib.context import CryptContext
 
 router = APIRouter()
 UPLOAD_FOLDER = "./uploads"
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+MAX_BCRYPT_LENGTH = 72  
 
 @router.get("/", summary="Get all users")
 async def fetch_users():
@@ -100,30 +102,28 @@ async def update_user(
 async def change_password(
     user_id: str,
     current_password: str = Form(...),
-    new_password: str = Form(...),
-    confirm_password: str = Form(...)
+    new_password: str = Form(...)
 ):
-    if new_password != confirm_password:
-        raise HTTPException(status_code=400, detail="New password and confirm password do not match")
+    try:
+        # Truncate passwords to avoid bcrypt error
+        current_password = current_password[:MAX_BCRYPT_LENGTH]
+        new_password = new_password[:MAX_BCRYPT_LENGTH]
 
-    user = await db.users.find_one({"_id": ObjectId(user_id)})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    # Check current password
-    stored_password = user.get("password")
-    if not stored_password or not pwd_context.verify(current_password, stored_password):
-        raise HTTPException(status_code=400, detail="Current password is incorrect")
+        # Verify current password
+        if not pwd_context.verify(current_password, user["password"]):
+            raise HTTPException(status_code=400, detail="Current password is incorrect")
 
-    # Hash new password
-    hashed_password = pwd_context.hash(new_password)
+        # Hash new password
+        hashed_password = pwd_context.hash(new_password)
 
-    # Update in DB
-    result = await db.users.update_one(
-        {"_id": ObjectId(user_id)},
-        {"$set": {"password": hashed_password}}
-    )
-    if result.matched_count == 0:
-        raise HTTPException(status_code=500, detail="Failed to update password")
+        # Update user password in DB
+        await db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"password": hashed_password}})
 
-    return {"success": True, "message": "Password updated successfully"}
+        return {"success": True, "message": "Password updated successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

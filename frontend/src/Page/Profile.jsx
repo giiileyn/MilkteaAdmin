@@ -15,6 +15,7 @@ export default function Profile() {
 
  useEffect(() => {
   const storedUser = localStorage.getItem("user");
+  const parsedUser = JSON.parse(storedUser);
   if (!storedUser) return;
 
   try {
@@ -77,33 +78,45 @@ const handleProfileUpdate = async (e) => {
 
 
   // ========== UPDATE PASSWORD ==========
-  const handlePasswordUpdate = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+const handlePasswordUpdate = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-    if (newPassword !== confirmPassword) {
-      setError("New password and confirm password do not match.");
-      return;
+  if (newPassword !== confirmPassword) {
+    setError("New password and confirm password do not match.");
+    return;
+  }
+
+  try {
+    const payload = {
+      currentPassword,
+      newPassword
+    };
+
+    const res = await axios.patch(
+      `http://localhost:4000/password/${user.id}`,
+      payload,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    if (res.data.success) {
+      setSuccess(res.data.message);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      // Preserve avatar in localStorage
+      const updatedUser = { ...user };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
     }
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Failed to update password");
+  }
+};
 
-    try {
-      const res = await axios.patch(
-        `http://localhost:5000/users/${user.id}/password`,
-        { currentPassword, newPassword }
-      );
 
-      if (res.data.success) {
-        setSuccess("Password updated successfully!");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.detail || "Failed to update password");
-    }
-  };
 
   return (
     <div className="profile-container">

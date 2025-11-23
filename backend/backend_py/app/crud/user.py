@@ -1,5 +1,7 @@
 from bson import ObjectId
 from app.database import db
+from passlib.hash import bcrypt
+
 
 async def get_all_users():
     """
@@ -67,3 +69,30 @@ async def update_user(user_id: str, name: str = None, email: str = None, avatar:
             "createdAt": user.get("createdAt")
         }
     return None
+
+
+async def update_user_password(user_id: str, current_password: str, new_password: str):
+    """
+    Change user's password after verifying current password.
+    """
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return None, "User not found"
+
+    # Verify current password
+    if not bcrypt.verify(current_password, user["password"]):
+        return None, "Current password is incorrect"
+
+    # Hash new password
+    hashed_password = bcrypt.hash(new_password)
+
+    # Update password in DB
+    result = await db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {"password": hashed_password}}
+    )
+
+    if result.matched_count == 0:
+        return None, "Failed to update password"
+
+    return True, "Password updated successfully"
