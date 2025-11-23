@@ -6,13 +6,34 @@ export default function Order() {
   const [tab, setTab] = useState("All");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState(null); // for receipt
+  const [selectedOrder, setSelectedOrder] = useState(null); 
+  const [editingOrderId, setEditingOrderId] = useState(null);
 
-  // EDIT HANDLER
-  const handleEdit = (order) => {
-    console.log("Edit order clicked:", order);
-    // TODO: open modal or dropdown to update status
-  };
+const handleEdit = (orderId) => {
+  setEditingOrderId(orderId); // show status buttons for this order
+};
+
+const handleStatusUpdate = async (order, newStatus) => {
+  try {
+    await axios.patch(`http://localhost:4000/orders/${order._id}/status`, {
+      status: newStatus,
+    });
+
+    // Update local state immediately
+    setOrders((prevOrders) =>
+      prevOrders.map((o) =>
+        o.id === order.id ? { ...o, status: newStatus } : o
+      )
+    );
+
+    setEditingOrderId(null); // hide status buttons
+  } catch (err) {
+    console.error("Failed to update order status:", err);
+    alert("Failed to update order status.");
+  }
+};
+
+
 
   // Fetch orders from backend
   useEffect(() => {
@@ -20,7 +41,8 @@ export default function Order() {
       try {
         const res = await axios.get("http://localhost:4000/orders");
         const data = res.data.map((o, index) => ({
-          id: index + 1,
+          _id: o._id, // keep backend ID for updates
+          id: index + 1, // for display only
           date: new Date(o.createdAt).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -34,6 +56,7 @@ export default function Order() {
             price: p.price,
           })),
         }));
+
         setOrders(data);
         setLoading(false);
       } catch (err) {
@@ -125,17 +148,35 @@ export default function Order() {
 
                 {/* STATUS + EDIT ICON (FOR PENDING ONLY) */}
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <span className={`status-badge ${order.status.toLowerCase()}`}>
-                    {order.status}
-                  </span>
+                <span className={`status-badge ${order.status.toLowerCase()}`}>
+                  {order.status}
+                </span>
 
-                  {/* Pencil icon for pending */}
-                  {order.status.toLowerCase() === "pending" && (
-                    <span className="edit-icon" onClick={() => handleEdit(order)}>
-                      🖉
-                    </span>
-                  )}
-                </div>
+                {order.status.toLowerCase() === "pending" && (
+                  <span className="edit-icon" onClick={() => handleEdit(order.id)}>
+                    🖉
+                  </span>
+                )}
+
+                {/* Show clickable buttons only for the order being edited */}
+                {editingOrderId === order.id && (
+                  <div style={{ marginLeft: "10px" }}>
+                    <button
+                      className="status-badge completed"
+                      onClick={() => handleStatusUpdate(order, "Completed")}
+                    >
+                      Completed
+                    </button>
+                    <button
+                      className="status-badge cancelled"
+                      onClick={() => handleStatusUpdate(order, "Cancelled")}
+                    >
+                      Cancelled
+                    </button>
+                  </div>
+                )}
+              </div>
+
               </div>
 
               <div className="order-items">

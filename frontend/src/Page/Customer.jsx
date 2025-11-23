@@ -84,14 +84,15 @@ const Customer = () => {
                   }}
                 >
                   <img
-                    src={c.avatar}
-                    alt="avatar"
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      objectFit: "cover",
-                    }}
-                  />
+                  src={c.avatar.startsWith("http") ? c.avatar : `http://127.0.0.1:5000${c.avatar}`}
+                  alt="avatar"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    objectFit: "cover",
+                  }}
+                />
+
                 </div>
                 {c.email}
               </td>
