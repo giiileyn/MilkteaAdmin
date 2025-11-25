@@ -1,70 +1,70 @@
 [
   {
     "name": "Alice Santos",
-    "email": "alice.santos@example.com",
+    "email": "alice.santos@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=1",
     "createdAt": "2025-11-01T09:00:00.000Z"
   },
   {
     "name": "Brian Cruz",
-    "email": "brian.cruz@example.com",
+    "email": "brian.cruz@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=2",
     "createdAt": "2025-11-02T10:30:00.000Z"
   },
   {
     "name": "Carla Reyes",
-    "email": "carla.reyes@example.com",
+    "email": "carla.reyes@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=3",
     "createdAt": "2025-11-03T11:15:00.000Z"
   },
   {
     "name": "David Lim",
-    "email": "david.lim@example.com",
+    "email": "david.lim@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=4",
     "createdAt": "2025-11-04T12:45:00.000Z"
   },
   {
     "name": "Ella Fernandez",
-    "email": "ella.fernandez@example.com",
+    "email": "ella.fernandez@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=5",
     "createdAt": "2025-11-05T14:20:00.000Z"
   },
   {
     "name": "Felix Navarro",
-    "email": "felix.navarro@example.com",
+    "email": "felix.navarro@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=6",
     "createdAt": "2025-11-06T15:10:00.000Z"
   },
   {
     "name": "Grace Molina",
-    "email": "grace.molina@example.com",
+    "email": "grace.molina@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=7",
     "createdAt": "2025-11-07T16:05:00.000Z"
   },
   {
     "name": "Henry Gonzales",
-    "email": "henry.gonzales@example.com",
+    "email": "henry.gonzales@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=8",
     "createdAt": "2025-11-08T17:30:00.000Z"
   },
   {
     "name": "Isla Mercado",
-    "email": "isla.mercado@example.com",
+    "email": "isla.mercado@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=9",
     "createdAt": "2025-11-09T18:15:00.000Z"
   },
   {
     "name": "Jack Torres",
-    "email": "jack.torres@example.com",
+    "email": "jack.torres@gmail.com",
     "password": "password123",
     "avatar": "https://i.pravatar.cc/150?img=10",
     "createdAt": "2025-11-10T19:00:00.000Z"
