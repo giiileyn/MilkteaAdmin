@@ -2,5 +2,18 @@
   { "name": "Classic Milk Tea", "description": "Traditional milk tea flavors loved by everyone." },
   { "name": "Fruit Tea", "description": "Refreshing fruit-flavored teas." },
   { "name": "Cheese Series", "description": "Milk teas topped with creamy cheese foam." },
-  { "name": "Special Mix", "description": "Unique and premium blends of flavors." }
+  { "name": "Special Mix", "description": "Unique and premium blends of flavors." },
+
+  { "name": "Brown Sugar Series", "description": "Sweet and rich drinks made with brown sugar syrup." },
+  { "name": "Coffee-Based Drinks", "description": "For coffee lovers looking for a caffeine kick." },
+  { "name": "Yakult Series", "description": "Tea and fruit blends infused with Yakult probiotics." },
+  { "name": "Fresh Brewed Tea", "description": "Pure and aromatic brewed teas." },
+  { "name": "Creamy Smoothies", "description": "Thick and creamy fruit or chocolate smoothies." },
+  { "name": "Healthy Blends", "description": "Low-sugar or organic options for health-conscious customers." },
+  { "name": "Milk Shakes", "description": "Rich and creamy milk-based beverages." },
+  { "name": "Seasonal Specials", "description": "Limited edition flavors available for a short time." },
+  { "name": "Iced Coolers", "description": "Light, refreshing, and non-tea beverages perfect for hot days." },
+  { "name": "Matcha Series", "description": "Drinks featuring premium Japanese matcha." },
+  { "name": "Chocolate Series", "description": "Chocolate-based drinks for sweet lovers." },
+  { "name": "Premium Series", "description": "High-quality blends using premium ingredients." }
 ]

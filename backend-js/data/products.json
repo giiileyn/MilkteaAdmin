@@ -9,7 +9,7 @@
       { "name": "Large", "price": 75 }
     ],
     "toppings": ["Pearl", "Nata de Coco"],
-    "image": "https://res.cloudinary.com/demo/image/upload/v1731473107/classic_milktea.png",
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764000732/Classic_Milk_Tea_pt6zsf.jpg",
     "stock": 500,
     "status": "available"
   },
@@ -23,7 +23,7 @@
       { "name": "Large", "price": 80 }
     ],
     "toppings": ["Pearl"],
-    "image": "https://res.cloudinary.com/demo/image/upload/v1731473107/wintermelon_milktea.png",
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001267/Wintermelon_Milk_Tea_evd8fe.webp",
     "stock": 600,
     "status": "available"
   },
@@ -37,8 +37,93 @@
       { "name": "Large", "price": 85 }
     ],
     "toppings": ["Nata de Coco"],
-    "image": "https://res.cloudinary.com/demo/image/upload/v1731473107/mango_fruittea.png",
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001334/aa50a758-ed71-4896-af33-18e4f2aa878d.png",
     "stock": 450,
+    "status": "available"
+  },
+
+  {
+    "name": "Strawberry Fruit Tea",
+    "category": "Fruit Tea",
+    "flavor": "Strawberry",
+    "price": 75,
+    "sizes": [
+      { "name": "Regular", "price": 75 },
+      { "name": "Large", "price": 90 }
+    ],
+    "toppings": ["Aloe Vera"],
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001498/08889096-a8c8-4227-a3fe-14fe52485a00.png",
+    "stock": 420,
+    "status": "available"
+  },
+  {
+    "name": "Cheese Matcha",
+    "category": "Cheese Series",
+    "flavor": "Matcha",
+    "price": 85,
+    "sizes": [
+      { "name": "Regular", "price": 85 },
+      { "name": "Large", "price": 100 }
+    ],
+    "toppings": ["Cheese Foam"],
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001596/8edfe965-f740-407d-b63c-c9f56121cb59.png",
+    "stock": 300,
+    "status": "available"
+  },
+  {
+    "name": "Cheese Cocoa",
+    "category": "Cheese Series",
+    "flavor": "Chocolate",
+    "price": 80,
+    "sizes": [
+      { "name": "Regular", "price": 80 },
+      { "name": "Large", "price": 95 }
+    ],
+    "toppings": ["Cheese Foam"],
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001689/754ba408-139c-4075-bd61-6058bf04617c.png",
+    "stock": 280,
+    "status": "available"
+  },
+  {
+    "name": "Brown Sugar Pearl Milk",
+    "category": "Special Mix",
+    "flavor": "Brown Sugar",
+    "price": 90,
+    "sizes": [
+      { "name": "Regular", "price": 90 },
+      { "name": "Large", "price": 110 }
+    ],
+    "toppings": ["Brown Sugar Pearl"],
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001745/bbe09147-ecbc-48d4-b12b-91407c573239.png",
+    "stock": 350,
+    "status": "available"
+  },
+  {
+    "name": "Dirty Matcha",
+    "category": "Special Mix",
+    "flavor": "Matcha + Brown Sugar",
+    "price": 95,
+    "sizes": [
+      { "name": "Regular", "price": 95 },
+      { "name": "Large", "price": 115 }
+    ],
+    "toppings": ["Pearl"],
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001794/e7891b9b-0e97-40fb-a712-1e4e5010a264.png",
+    "stock": 260,
+    "status": "available"
+  },
+  {
+    "name": "Oreo Milk Tea",
+    "category": "Special Mix",
+    "flavor": "Oreo",
+    "price": 85,
+    "sizes": [
+      { "name": "Regular", "price": 85 },
+      { "name": "Large", "price": 100 }
+    ],
+    "toppings": ["Oreo Crumbs", "Pearl"],
+    "image": "https://res.cloudinary.com/dpxktub8r/image/upload/v1764001844/16301905-d635-46c2-830c-e9f19ef9c25f.png",
+    "stock": 310,
     "status": "available"
   }
 ]

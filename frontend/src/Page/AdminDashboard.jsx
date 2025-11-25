@@ -206,7 +206,7 @@ export default function AdminDashboard() {
           <img src={moneyIcon} alt="Revenue" style={{ width: "45px", height: "45px" }} />
         </div>
         <div className="stat-info">
-          <h2>${stats.totalRevenue.toLocaleString()}</h2>
+          <h2>₱{stats.totalRevenue.toLocaleString()}</h2>
           <p>Total Revenue</p>
         </div>
       </div>

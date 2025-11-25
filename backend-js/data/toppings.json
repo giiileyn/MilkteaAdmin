@@ -2,5 +2,20 @@
   { "name": "Pearl", "price": 10, "stock": 500, "status": "available" },
   { "name": "Nata de Coco", "price": 12, "stock": 400, "status": "available" },
   { "name": "Pudding", "price": 15, "stock": 350, "status": "available" },
-  { "name": "Cheese Foam", "price": 20, "stock": 300, "status": "available" }
+  { "name": "Cheese Foam", "price": 20, "stock": 300, "status": "available" },
+
+  { "name": "Grass Jelly", "price": 12, "stock": 380, "status": "available" },
+  { "name": "Aloe Vera", "price": 14, "stock": 260, "status": "available" },
+  { "name": "Red Beans", "price": 15, "stock": 320, "status": "available" },
+  { "name": "Oreo Crumbs", "price": 18, "stock": 250, "status": "available" },
+  { "name": "Coffee Jelly", "price": 15, "stock": 340, "status": "available" },
+  { "name": "Custard Jelly", "price": 14, "stock": 290, "status": "available" },
+  { "name": "Brown Sugar Pearl", "price": 12, "stock": 450, "status": "available" },
+  { "name": "Fruit Bits", "price": 16, "stock": 270, "status": "available" },
+  { "name": "Whipped Cream", "price": 18, "stock": 200, "status": "available" },
+  { "name": "Mini Mochi", "price": 20, "stock": 180, "status": "available" },
+  { "name": "Chocolate Chips", "price": 17, "stock": 220, "status": "available" },
+  { "name": "Caramel Drizzle", "price": 15, "stock": 210, "status": "available" },
+  { "name": "Honey Jelly", "price": 14, "stock": 260, "status": "available" },
+  { "name": "Matcha Jelly", "price": 18, "stock": 230, "status": "available" }
 ]
